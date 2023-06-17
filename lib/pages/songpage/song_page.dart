@@ -21,8 +21,8 @@ class _SongPageState extends State<SongPage> {
   bool isPlaying = false;
   bool isPaused = false;
   bool isRepeat=false;
-
-
+  Color color=Colors.white;
+  bool mute = false;
 
   @override
   void initState() {
@@ -113,11 +113,20 @@ class _SongPageState extends State<SongPage> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   GestureDetector(
-                    onTap:()=>Get.back(),
-                    child:  Icon(Icons.arrow_back_ios,color: Colors.deepPurple.shade800,),
+                    onTap:(){
+                      if(isPlaying==true){
+                        AdvancedPlayer.pause();
+                        _position=Duration(seconds: 0);
+                        setState(() {
+                          isPlaying=false;
+                        });
+                      }
+                      Get.back();
+                      },
+                    child:  Icon(Icons.arrow_back_ios,color: Colors.white,),
                   ),
 
-                  Icon(Icons.more_vert, color:Colors.deepPurple.shade800,)
+                  Icon(Icons.more_vert, color:Colors.white,)
                 ],
               ),
           ),
@@ -162,6 +171,27 @@ class _SongPageState extends State<SongPage> {
                     children: [
                       Icon(Icons.timer_outlined,color: Colors.white.withOpacity(0.6),),
                       GestureDetector(
+                        onTap:(){
+                          if(isRepeat==false){
+                            AdvancedPlayer.setReleaseMode(ReleaseMode.loop);
+                            setState(() {
+                              isRepeat=true;
+                              color=Colors.blue;
+                            });
+                          }else if(isRepeat==true){
+                            AdvancedPlayer.setReleaseMode(ReleaseMode.release);
+                            setState(() {
+                              isRepeat=false;
+                              color=Colors.white;
+                            });
+                          }
+                        },
+                        child:  Icon(Icons.repeat,color: color, size: 35.sp,),
+                      ),
+                      GestureDetector(
+                        onTap:(){
+                          AdvancedPlayer.setPlaybackRate(0.5);
+                        },
                         child:  Icon(Icons.skip_previous,color: Colors.white, size: 35.sp,),
                       ),
                       GestureDetector(
@@ -189,9 +219,24 @@ class _SongPageState extends State<SongPage> {
                         ),
                       ),
                       GestureDetector(
+                        onTap:(){
+                          AdvancedPlayer.setPlaybackRate(1.5);
+                        },
                         child:  Icon(  Icons.skip_next,color: Colors.white, size: 35.sp,),
                       ),
-                      Icon(Icons.volume_down,color: Colors.white.withOpacity(0.6),),
+                     GestureDetector(
+                       onTap:(){
+                        setState(() {
+                          mute=!mute;
+                        });
+                         if(mute==false){
+                           AdvancedPlayer.setVolume(1.0);
+                         }else if(mute==true){
+                           AdvancedPlayer.setVolume(0);
+                         }
+                       },
+                       child:  Icon(mute==false ? Icons.volume_up_sharp : Icons.volume_off_sharp,color: Colors.white,),
+                     )
                     ],
                   )
                 ],
@@ -216,8 +261,8 @@ class _SongPageState extends State<SongPage> {
 
   Widget slider() {
     return Slider(
-        activeColor: Colors.red,
-        inactiveColor: Colors.grey,
+        activeColor: Colors.purple,
+        inactiveColor: Colors.white,
         value: _position.inSeconds.toDouble(),
         min: 0.0,
         max: _duration.inSeconds.toDouble(),
